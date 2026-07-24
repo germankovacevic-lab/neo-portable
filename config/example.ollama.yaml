@@ -1,0 +1,9 @@
+# Same agent, local brain. Proves the loop is provider-agnostic: swap the brain, nothing else changes.
+business: { id: acme, name: "Acme Co", leash: long }
+agent: default
+persona: ./test/fixtures/persona.md
+brain: { provider: ollama, model: "qwen2.5:32b", contextLimitTokens: 32000 }
+gate: { allow: [calculate], escalate: [] }
+memory: { dir: ./.neo/acme-memory }
+tools: [calculate]
+maxTurns: 6

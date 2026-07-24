@@ -1,0 +1,16 @@
+# Config for the REMOTE agent with a Gemini brain (runs as a daemon on the other machine).
+# Test-machine posture: OPEN gate (experiment without fear of breaking things).
+# The channel's only lock is the token (AGENT_TOKEN), not the gate.
+business: { id: remote-box, name: "Remote Box", leash: long }
+agent: default
+persona: ./test/fixtures/persona.md
+brain: { provider: gemini, model: "gemini-2.5-flash", contextLimitTokens: 1000000 }
+gate: { mode: open, allow: [], escalate: [] }   # mode:open → allows EVERYTHING (OpenGate)
+tools: [calculate, shell]                        # shell = the hand
+maxTurns: 12
+
+# Start the daemon (on the remote machine):
+#   $env:RELAY_URL="https://neo-portable-relay.<sub>.workers.dev"
+#   $env:AGENT_TOKEN="<agent-token>"
+#   $env:GEMINI_API_KEY="<key>"
+#   npx tsx src/cli.ts --daemon config/example.remote.gemini.yaml

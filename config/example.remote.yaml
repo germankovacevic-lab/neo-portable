@@ -1,0 +1,20 @@
+# Config for the REMOTE agent (runs as a daemon on the other machine).
+# Test-machine posture: OPEN gate (experiment without fear of breaking things).
+# The channel's only lock is the token (AGENT_TOKEN), not the gate.
+business: { id: remote-box, name: "Remote Box", leash: long }
+agent: default
+persona: ./test/fixtures/persona.md
+brain: { provider: anthropic, model: claude-haiku-4-5-20251001, contextLimitTokens: 200000 }
+gate: { mode: open, allow: [], escalate: [] }   # mode:open → allows EVERYTHING (OpenGate); allow/escalate are ignored.
+tools: [calculate, shell]                        # shell = the hand
+maxTurns: 12
+
+# Start the daemon (on the remote machine):
+#   RELAY_URL=https://neo-portable-relay.<sub>.workers.dev \
+#   AGENT_TOKEN=<agent-token> \
+#   ANTHROPIC_API_KEY=<key> \
+#   node dist/cli.js --daemon config/example.remote.yaml
+#
+# Send a task (from the operator):
+#   RELAY_URL=... OPERATOR_TOKEN=<operator-token> \
+#   node dist/cli.js --remote-send "list what's in ~/Downloads"

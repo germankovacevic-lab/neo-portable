@@ -1,0 +1,9 @@
+# One YAML = one agent. Copy this file and stamp out a new agent.
+business: { id: acme, name: "Acme Co", leash: long }   # leash: short for new/PII-sensitive tenants
+agent: default
+persona: ./test/fixtures/persona.md
+brain: { provider: anthropic, model: claude-haiku-4-5-20251001, contextLimitTokens: 200000 }
+gate: { allow: [calculate], escalate: [] }             # held-by-default: anything not listed is denied
+memory: { dir: ./.neo/acme-memory }
+tools: [calculate]
+maxTurns: 6

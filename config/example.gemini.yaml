@@ -1,0 +1,10 @@
+# Same agent, Google Gemini brain. Third API convention (Anthropic Messages, Ollama/OpenAI-style,
+# Google generativelanguage) — swap the brain, nothing else changes. Needs GEMINI_API_KEY in env.
+business: { id: acme, name: "Acme Co", leash: long }
+agent: default
+persona: ./test/fixtures/persona.md
+brain: { provider: gemini, model: "gemini-2.5-flash", contextLimitTokens: 1000000 }
+gate: { allow: [calculate], escalate: [] }
+memory: { dir: ./.neo/acme-memory }
+tools: [calculate]
+maxTurns: 6

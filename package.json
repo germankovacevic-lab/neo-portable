@@ -1,0 +1,26 @@
+{
+  "name": "neo-portable",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A model-agnostic, fail-closed agent runtime. The portable chassis your agent runs on — vendor-neutral, safe by default, hosted by you.",
+  "license": "LicenseRef-LICENSE",
+  "author": "gk@agneo.app",
+  "repository": { "type": "git", "url": "https://github.com/germankovacevic-lab/neo-portable" },
+  "keywords": ["ai-agent", "agent-runtime", "llm", "model-agnostic", "tool-use", "fail-closed", "typescript"],
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "yaml": "^2.5.0"
+  }
+}

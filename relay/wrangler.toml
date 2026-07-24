@@ -1,0 +1,14 @@
+name = "neo-portable-relay"
+main = "src/index.ts"
+compatibility_date = "2026-06-15"
+
+# Job mailbox for the remote-control channel. D1 = queue + result store + audit log.
+[[d1_databases]]
+binding = "DB"
+database_name = "neo-portable-relay"
+# Fill in with your own D1 database id: `wrangler d1 create neo-portable-relay`
+database_id = "<your-d1-database-id>"
+
+# Tokens do NOT go here. Set them as secrets:
+#   wrangler secret put OPERATOR_TOKEN
+#   wrangler secret put AGENT_TOKEN
