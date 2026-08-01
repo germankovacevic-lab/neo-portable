@@ -29,6 +29,10 @@ moment you want to run one economically and safely across models. NEO Portable i
 > writing a clean-room, vendor-neutral implementation. The knowledge was the teacher; the chassis
 > is our own.
 
+**Design reasoning:** the decisions behind the shape — what was chosen, what was rejected, and
+why — are in [DECISIONS.md](./DECISIONS.md). Why this shape matters for a *browser* agent
+specifically — brain and eyes, with hands you can trust — is in [BROWSER.md](./BROWSER.md).
+
 ---
 
 ## Architecture at a glance
@@ -146,7 +150,7 @@ The same `run()` loop, three brains across three different API conventions, end-
 |-------|-------|----------------|--------|
 | `OllamaBrain` | `qwen2.5:32b` (local) | OpenAI-style `tools` / `tool_calls` | prompt → `calculate` → gate **allow** → fed back → correct answer |
 | `AnthropicBrain` | `claude-haiku-4-5` (cloud) | Anthropic Messages `tool_use` / `tool_result` | `1847 × 2963` → tool → gate **allow** → `5472661` ✓ |
-| `GeminiBrain` | `gemini-2.5-flash` (cloud) | Google `functionCall` / `functionResponse` | `21 × 2` → tool → gate **allow** → `42` ✓ |
+| `GeminiBrain` | `gemini-flash-latest` (cloud) | Google `functionCall` / `functionResponse` | `21 × 2` → tool → gate **allow** → `42` ✓ |
 
 The point isn't "three vendors" — it's **three genuinely different tool-calling wire formats**
 behind one unchanged loop. Gemini was the real stress test: its `functionResponse` needs the
@@ -156,6 +160,27 @@ loop, the gate, or the tools. The Anthropic run also validated multi-turn tool u
 API — the assistant's `tool_use` block is persisted into history paired with its `tool_result`, so
 there are no orphaned results and no `400`s. **The chassis is stampable:** swap the brain in the
 YAML, the loop doesn't change.
+
+Every step is a structured event on stdout — the same run, verbatim (Gemini brain; run id and
+timestamps elided for width):
+
+```console
+$ npx tsx src/cli.ts config/example.gemini.yaml "What is 21 times 2?"
+{"t":"run_start","turn":0}
+{"t":"brain_call_start","turn":0}
+{"t":"brain_call_end","turn":0}
+{"t":"gate_decision","decision":{"kind":"allow"},"turn":1}
+{"t":"tool_execute_start","tool":"calculate","turn":1}
+{"t":"tool_execute_end","tool":"calculate","turn":1}
+{"t":"brain_call_start","turn":1}
+{"t":"brain_call_end","turn":1}
+{"t":"run_end","turn":2}
+21 times 2 is 42.
+```
+
+Two brain round-trips (call the tool, then read its result), one gated execution, done — and the
+`gate_decision:allow` is the security membrane recorded inline, not narrated after the fact. This is
+the same event stream a supervisor or an audit log consumes.
 
 ---
 
@@ -219,7 +244,7 @@ npx tsx src/cli.ts config/example.ollama.yaml "What is 6 times 7?"
 cp .env.example .env
 npx tsx src/cli.ts config/example.anthropic.yaml "What is 1847 times 2963?"
 
-# Gemini brain — needs GEMINI_API_KEY in env
+# Gemini brain — add GEMINI_API_KEY to .env (same as the cloud step above)
 npx tsx src/cli.ts config/example.gemini.yaml "What is 21 times 2?"
 ```
 

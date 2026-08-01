@@ -3,7 +3,7 @@
 business: { id: acme, name: "Acme Co", leash: long }
 agent: default
 persona: ./test/fixtures/persona.md
-brain: { provider: gemini, model: "gemini-2.5-flash", contextLimitTokens: 1000000 }
+brain: { provider: gemini, model: "gemini-flash-latest", contextLimitTokens: 1000000 }
 gate: { allow: [calculate], escalate: [] }
 memory: { dir: ./.neo/acme-memory }
 tools: [calculate]

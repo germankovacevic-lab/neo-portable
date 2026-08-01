@@ -6,7 +6,10 @@ export interface Message {
   toolCallId?: string;
   toolCalls?: ToolCall[];
 }
-export interface ToolCall { id: string; name: string; input: unknown; }
+// `providerMeta` is an opaque, provider-local bag: a brain may stash wire details it must
+// echo back on later turns (e.g. Gemini's `thoughtSignature`). The loop, gate, and tools
+// never read it — it rides the message history untouched, keeping the contract model-agnostic.
+export interface ToolCall { id: string; name: string; input: unknown; providerMeta?: Record<string, unknown>; }
 export interface ToolResult { ok: boolean; output: string; error?: string; }
 export interface ToolResultMessage { role: "tool"; toolCallId: string; result: ToolResult; }
 

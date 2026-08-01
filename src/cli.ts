@@ -112,6 +112,9 @@ async function remoteSend(task: string): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  // Load .env if present (Node 22+ native, no dep) so the documented `cp .env.example .env`
+  // flow actually populates process.env. Guarded: Ollama-only users need no .env.
+  try { process.loadEnvFile(); } catch { /* no .env file — rely on ambient environment */ }
   const argv = process.argv.slice(2);
   if (argv[0] === "--daemon") return runDaemonMode(argv[1]!);
   if (argv[0] === "--remote-send") return remoteSend(argv.slice(1).join(" "));

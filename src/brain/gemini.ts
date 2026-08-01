@@ -11,6 +11,9 @@ interface GeminiPart {
   text?: string;
   functionCall?: { name: string; args?: unknown };
   functionResponse?: { name: string; response: unknown };
+  // Newer Gemini models attach an opaque thought signature to each functionCall part and
+  // require it echoed back on the follow-up turn, else they 400. We capture and replay it.
+  thoughtSignature?: string;
 }
 export interface GeminiContent { role: "user" | "model"; parts: GeminiPart[]; }
 interface GeminiResp {
@@ -43,7 +46,10 @@ export function toGeminiContents(messages: Message[]): GeminiContent[] {
     } else if (m.role === "assistant") {
       const parts: GeminiPart[] = [];
       if (m.content) parts.push({ text: m.content });
-      for (const c of m.toolCalls ?? []) parts.push({ functionCall: { name: c.name, args: c.input } });
+      for (const c of m.toolCalls ?? []) {
+        const sig = (c.providerMeta as { thoughtSignature?: string } | undefined)?.thoughtSignature;
+        parts.push({ functionCall: { name: c.name, args: c.input }, ...(sig ? { thoughtSignature: sig } : {}) });
+      }
       raw.push({ role: "model", parts: parts.length > 0 ? parts : [{ text: "" }] });
     } else {
       raw.push({ role: "user", parts: [{ text: m.content }] });
@@ -65,7 +71,7 @@ export function geminiToChunks(r: GeminiResp): BrainChunk[] {
   let i = 0;
   for (const p of parts) {
     if (p.text) out.push({ type: "text", text: p.text });
-    else if (p.functionCall) out.push({ type: "tool_call", call: { id: `gem_${i++}`, name: p.functionCall.name, input: p.functionCall.args ?? {} } });
+    else if (p.functionCall) out.push({ type: "tool_call", call: { id: `gem_${i++}`, name: p.functionCall.name, input: p.functionCall.args ?? {}, ...(p.thoughtSignature ? { providerMeta: { thoughtSignature: p.thoughtSignature } } : {}) } });
   }
   out.push({ type: "usage", tokensIn: r?.usageMetadata?.promptTokenCount ?? 0, tokensOut: r?.usageMetadata?.candidatesTokenCount ?? 0 });
   return out;
